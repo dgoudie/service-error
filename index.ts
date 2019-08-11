@@ -4,13 +4,15 @@ import express from 'express';
 export class ServiceError extends Error {
     public timestamp: string;
     public error: string;
+    public message: string;
 
     constructor(
         public status: number,
-        public message: string,
+        message: string,
         public path: string
     ) {
         super(message);
+        this.message = message;
         this.error = HttpStatus.getStatusText(status)
         this.timestamp = new Date().toISOString();
     }
