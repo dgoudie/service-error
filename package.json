@@ -1,6 +1,6 @@
 {
   "name": "@stan/service-error",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "stan.systems standard error interface",
   "main": "dist/index.js",
   "files": [
