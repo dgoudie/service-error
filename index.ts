@@ -1,7 +1,12 @@
-export interface ServiceError {
-    timestamp: string;
-    status: number;
-    error: string;
-    message: string;
-    path: string;
+export class ServiceError extends Error {
+
+    constructor(
+        public timestamp: string,
+        public status: number,
+        public error: string,
+        public message: string,
+        public path: string
+    ) {
+        super(message);
+    }
 }
