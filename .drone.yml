@@ -18,7 +18,7 @@ steps:
   commands:
   - npm run tsc
 - name: publish
-  image: node:latest
+  image: node:latest 
   commands:
   - npm set registry https://$${NEXUS_NPM_REPO}/
   - npm set //$${NEXUS_NPM_REPO}/:_authToken=$${NPM_TOKEN}
