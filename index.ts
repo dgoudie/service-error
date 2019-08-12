@@ -1,18 +1,15 @@
 import express from 'express';
 import HttpStatus from 'http-status-codes';
 
-export class ServiceError extends Error {
+export class ServiceError {
     public timestamp: string;
     public error: string;
-    public message: string;
 
     constructor(
         public status: number,
-        message: string,
+        public message: string,
         public path: string,
     ) {
-        super(message);
-        this.message = message;
         this.error = HttpStatus.getStatusText(status);
         this.timestamp = new Date().toISOString();
     }
@@ -31,3 +28,9 @@ export function serviceErrorHandler() {
         res.status(err.status).send(err);
     };
 }
+
+console.log(new ServiceError(
+    400,
+    'testError',
+    '/',
+));
