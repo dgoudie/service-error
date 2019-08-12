@@ -1,6 +1,9 @@
 {
     "git": {
-        "tagName": "v${version}"
+        "tagName": "v${version}",
+        "commit": true,
+        "tag": true,
+        "push": true
     },
     "github": {
         "release": true
