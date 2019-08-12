@@ -1,3 +1,4 @@
+import { getLogger } from '@log4js-node/log4js-api';
 import express from 'express';
 import HttpStatus from 'http-status-codes';
 
@@ -25,7 +26,7 @@ export function serviceErrorHandler() {
         if (err instanceof ServiceError) {
             err.path = req.path;
             if (err.status >= 500) {
-                console.error(err.message);
+                getLogger().error(err.message);
             }
             res.status(err.status).send(err);
         } else {
