@@ -10,7 +10,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc",
-    "release": "release-it"
+    "release": "release-it --ci --patch",
+    "release-minor": "release-it --ci --minor",
+    "release-major": "release-it --ci --major"
   },
   "author": "Daniel Goudie",
   "license": "MIT",
