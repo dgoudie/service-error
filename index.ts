@@ -28,9 +28,3 @@ export function serviceErrorHandler() {
         res.status(err.status).send(err);
     };
 }
-
-console.log(new ServiceError(
-    400,
-    'testError',
-    '/',
-));
