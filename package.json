@@ -23,13 +23,5 @@
   },
   "devDependencies": {
     "release-it": "^12.3.5"
-  },
-  "release-it": {
-    "git": {
-      "tagName": "v${version}"
-    },
-    "github": {
-      "release": true
-    }
   }
 }
