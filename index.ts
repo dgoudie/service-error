@@ -1,5 +1,5 @@
-import HttpStatus from 'http-status-codes';
 import express from 'express';
+import HttpStatus from 'http-status-codes';
 
 export class ServiceError extends Error {
     public timestamp: string;
@@ -9,11 +9,11 @@ export class ServiceError extends Error {
     constructor(
         public status: number,
         message: string,
-        public path: string
+        public path: string,
     ) {
         super(message);
         this.message = message;
-        this.error = HttpStatus.getStatusText(status)
+        this.error = HttpStatus.getStatusText(status);
         this.timestamp = new Date().toISOString();
     }
 }
@@ -21,13 +21,13 @@ export class ServiceError extends Error {
 export function serviceErrorHandler() {
     return (
         err: ServiceError,
-        _req: express.Request,
+        req: express.Request,
         res: express.Response,
-        _next: express.NextFunction
+        next: express.NextFunction,
     ) => {
         if (err.status >= 500) {
             console.error(err.message);
         }
         res.status(err.status).send(err);
-    }
+    };
 }
