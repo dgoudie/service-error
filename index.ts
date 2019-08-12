@@ -4,11 +4,11 @@ import HttpStatus from 'http-status-codes';
 export class ServiceError {
     public timestamp: string;
     public error: string;
+    public path: string;
 
     constructor(
         public status: number,
         public message: string,
-        public path: string,
     ) {
         this.error = HttpStatus.getStatusText(status);
         this.timestamp = new Date().toISOString();
@@ -22,9 +22,14 @@ export function serviceErrorHandler() {
         res: express.Response,
         next: express.NextFunction,
     ) => {
-        if (err.status >= 500) {
-            console.error(err.message);
+        if (err instanceof ServiceError) {
+            err.path = req.path;
+            if (err.status >= 500) {
+                console.error(err.message);
+            }
+            res.status(err.status).send(err);
+        } else {
+            next(err);
         }
-        res.status(err.status).send(err);
     };
 }
