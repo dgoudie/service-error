@@ -1,14 +1,14 @@
 {
-    "git": {
-        "tagName": "v${version}",
-        "commit": true,
-        "tag": true,
-        "push": true
-    },
-    "github": {
-        "release": true
-    },
-    "npm": {
-        "publish": false
-    }
+  "git": {
+    "tagName": "v${version}",
+    "commit": true,
+    "tag": true,
+    "push": true
+  },
+  "github": {
+    "release": true
+  },
+  "npm": {
+    "publish": false
+  }
 }

@@ -2,49 +2,91 @@ kind: pipeline
 name: default
 
 steps:
-- name: install
-  image: node:latest
-  commands: 
-  - npm set registry https://$${NEXUS_NPM_REPO}/
-  - npm set //$${NEXUS_NPM_REPO}/:_authToken=$${NPM_TOKEN}
-  - npm ci --only=production
-  environment:
-    NEXUS_NPM_REPO:
-      from_secret: NEXUS_NPM_REPO
-    NPM_TOKEN:
-      from_secret: NPM_TOKEN
-- name: build
-  image: node:latest
-  commands:
-  - npm run tsc
-- name: publish
-  image: node:latest 
-  commands:
-  - npm set registry https://$${NEXUS_NPM_REPO}/
-  - npm set //$${NEXUS_NPM_REPO}/:_authToken=$${NPM_TOKEN}
-  - npm publish
-  environment:
-    NEXUS_NPM_REPO:
-      from_secret: NEXUS_NPM_REPO
-    NPM_TOKEN:
-      from_secret: NPM_TOKEN
-  when:
-    event:
-    - tag
-- name: notify
-  image: drillster/drone-email
-  host: smtp.gmail.com
-  from: "${NOTIFY_EMAIL_USERNAME}@gmail.com"
-  environment: 
-    EMAIL_HOST: "smtp.gmail.com"
-    PLUGIN_FROM:
-      from_secret: NOTIFY_EMAIL_ADDRESS
-    EMAIL_RECIPIENTS:
-      from_secret: EMAIL
-    PLUGIN_RECIPIENTS_ONLY: true
-    EMAIL_USERNAME:
-      from_secret: NOTIFY_EMAIL_USERNAME
-    EMAIL_PASSWORD:
-      from_secret: NOTIFY_EMAIL_PASSWORD
-  when:
-    status: [ changed, failure ]
+  - name: install
+    image: node:latest
+    commands:
+      - npm set registry https://$${NEXUS_NPM_REPO}/
+      - npm set //$${NEXUS_NPM_REPO}/:_authToken=$${NPM_TOKEN}
+      - npm ci
+    environment:
+      NEXUS_NPM_REPO:
+        from_secret: NEXUS_NPM_REPO
+      NPM_TOKEN:
+        from_secret: NPM_TOKEN
+  - name: build
+    image: node:latest
+    commands:
+      - npm run tsc
+  - name: publish
+    image: node:latest
+    commands:
+      - npm set registry https://$${NEXUS_NPM_REPO}/
+      - npm set //$${NEXUS_NPM_REPO}/:_authToken=$${NPM_TOKEN}
+      - npm publish
+    environment:
+      NEXUS_NPM_REPO:
+        from_secret: NEXUS_NPM_REPO
+      NPM_TOKEN:
+        from_secret: NPM_TOKEN
+    when:
+      event:
+        - tag
+  - name: notify
+    image: drillster/drone-email
+    host: smtp.gmail.com
+    from: '${NOTIFY_EMAIL_USERNAME}@gmail.com'
+    environment:
+      EMAIL_HOST: 'smtp.gmail.com'
+      PLUGIN_FROM:
+        from_secret: NOTIFY_EMAIL_ADDRESS
+      EMAIL_RECIPIENTS:
+        from_secret: EMAIL
+      PLUGIN_RECIPIENTS_ONLY: true
+      EMAIL_USERNAME:
+        from_secret: NOTIFY_EMAIL_USERNAME
+      EMAIL_PASSWORD:
+        from_secret: NOTIFY_EMAIL_PASSWORD
+    when:
+      status: [changed, failure]
+
+---
+kind: secret
+name: EMAIL
+get:
+  path: secret/drone-ci
+  name: EMAIL
+
+---
+kind: secret
+name: NEXUS_NPM_REPO
+get:
+  path: secret/drone-ci
+  name: NEXUS_NPM_REPO
+
+---
+kind: secret
+name: NPM_TOKEN
+get:
+  path: secret/drone-ci
+  name: NPM_TOKEN
+
+---
+kind: secret
+name: NOTIFY_EMAIL_USERNAME
+get:
+  path: secret/drone-ci
+  name: NOTIFY_EMAIL_USERNAME
+
+---
+kind: secret
+name: NOTIFY_EMAIL_PASSWORD
+get:
+  path: secret/drone-ci
+  name: NOTIFY_EMAIL_PASSWORD
+
+---
+kind: secret
+name: NOTIFY_EMAIL_ADDRESS
+get:
+  path: secret/drone-ci
+  name: NOTIFY_EMAIL_ADDRESS
