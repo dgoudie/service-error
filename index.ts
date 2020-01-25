@@ -34,10 +34,12 @@ export function handleRemainingErrors() {
   };
 }
 
-export function translateServiceErrors() {
+export function translateServiceErrors(
+  logByCode = (httpStatusCode: number) => httpStatusCode >= 500 && httpStatusCode < 600
+) {
   return (err: ServiceError, req: express.Request, res: express.Response, next: express.NextFunction) => {
     err.path = req.path;
-    if (err.status >= 500) {
+    if (logByCode(err.status)) {
       getLogger().error(err.message);
     }
     res.status(err.status).send(err);
