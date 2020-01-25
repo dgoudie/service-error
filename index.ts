@@ -45,8 +45,16 @@ export function translateServiceErrors() {
   };
 }
 
-export function sendNotifications(mailgun: Mailgun, sendTo: string, serviceName: string) {
+export function sendNotifications(
+  mailgun: Mailgun,
+  sendTo: string,
+  serviceName: string,
+  sendByCode = (httpStatusCode: number) => httpStatusCode >= 500 && httpStatusCode < 600
+) {
   return (err: ServiceError, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    if (!sendByCode(err.status)) {
+      return;
+    }
     const { stackTrace, trimmedError } = (({ stackTrace, ...err }) => ({ stackTrace, trimmedError: err }))(err);
     const emailData: messages.SendData = {
       to: sendTo,
