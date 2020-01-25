@@ -1,6 +1,7 @@
 import { getLogger } from '@log4js-node/log4js-api';
 import express from 'express';
 import HttpStatus from 'http-status-codes';
+import { Mailgun, messages } from 'mailgun-js';
 
 export class ServiceError {
   public timestamp: string;
@@ -26,6 +27,19 @@ export function handleRemainingErrors() {
     } else {
       next(err);
     }
+  };
+}
+
+export function sendNotifications(mailgun: Mailgun, sendTo: string) {
+  return (err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const emailData: messages.SendData = {
+      to: sendTo,
+      from: `do-not-reply@${mailgun['domain']}`,
+      subject: 'test',
+      html: '<div>test</div>'
+    };
+    mailgun.messages().send(emailData, err => !!err && getLogger().error(err));
+    next(err);
   };
 }
 
