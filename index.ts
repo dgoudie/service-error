@@ -8,7 +8,7 @@ export class ServiceError {
   public error: string;
   public path: string;
 
-  constructor(public status: number, public message: string) {
+  constructor(public status: number, public message: string, public stackTrace: string = null) {
     this.error = HttpStatus.getStatusText(status);
     this.timestamp = new Date().toISOString();
   }
@@ -23,36 +23,42 @@ export function handleNotFound() {
 export function handleRemainingErrors() {
   return (err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (!(err instanceof ServiceError)) {
-      throw new ServiceError(500, err instanceof Error ? err.message : JSON.stringify(err));
+      throw new ServiceError(
+        500,
+        err instanceof Error ? err.message : JSON.stringify(err),
+        err instanceof Error ? err.stack : null
+      );
     } else {
       next(err);
     }
-  };
-}
-
-export function sendNotifications(mailgun: Mailgun, sendTo: string) {
-  return (err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const emailData: messages.SendData = {
-      to: sendTo,
-      from: `do-not-reply@${mailgun['domain']}`,
-      subject: 'test',
-      html: '<div>test</div>'
-    };
-    mailgun.messages().send(emailData, err => !!err && getLogger().error(err));
-    next(err);
   };
 }
 
 export function translateServiceErrors() {
   return (err: ServiceError, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (err instanceof ServiceError) {
-      err.path = req.path;
-      if (err.status >= 500) {
-        getLogger().error(err.message);
-      }
-      res.status(err.status).send(err);
-    } else {
-      next(err);
+    err.path = req.path;
+    if (err.status >= 500) {
+      getLogger().error(err.message);
     }
+    res.status(err.status).send(err);
+    next(err);
+  };
+}
+
+export function sendNotifications(mailgun: Mailgun, sendTo: string, serviceName: string) {
+  return (err: ServiceError, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const { stackTrace, trimmedError } = (({ stackTrace, ...err }) => ({ stackTrace, trimmedError: err }))(err);
+    const emailData: messages.SendData = {
+      to: sendTo,
+      from: `do-not-reply@${mailgun['domain']}`,
+      subject: `[${serviceName}] - ${err.error}`,
+      html: `<header>Error:</header>
+      <pre>${JSON.stringify(trimmedError)}</pre>
+      <header>Stack Trace:</header>
+      <pre>${stackTrace}</pre>
+      `
+    };
+    mailgun.messages().send(emailData, err => !!err && getLogger().error(err));
+    next(err);
   };
 }
