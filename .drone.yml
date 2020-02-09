@@ -33,21 +33,18 @@ steps:
         - tag
   - name: notify
     image: drillster/drone-email
-    host: smtp.gmail.com
-    from: '${NOTIFY_EMAIL_USERNAME}@gmail.com'
     environment:
-      EMAIL_HOST: 'smtp.gmail.com'
+      PLUGIN_HOST:
+        from_secret: MAILGUN_SMTP_HOST
       PLUGIN_FROM:
-        from_secret: NOTIFY_EMAIL_ADDRESS
-      EMAIL_RECIPIENTS:
+        from_secret: MAILGUN_SMTP_SENDER
+      PLUGIN_RECIPIENTS:
         from_secret: EMAIL
+      PLUGIN_USERNAME:
+        from_secret: MAILGUN_SMTP_USERNAME
+      PLUGIN_PASSWORD:
+        from_secret: MAILGUN_SMTP_PASSWORD
       PLUGIN_RECIPIENTS_ONLY: true
-      EMAIL_USERNAME:
-        from_secret: NOTIFY_EMAIL_USERNAME
-      EMAIL_PASSWORD:
-        from_secret: NOTIFY_EMAIL_PASSWORD
-    when:
-      status: [changed, failure]
 
 ---
 kind: secret
@@ -72,21 +69,28 @@ get:
 
 ---
 kind: secret
-name: NOTIFY_EMAIL_USERNAME
+name: MAILGUN_SMTP_PASSWORD
 get:
   path: secret/drone-ci
-  name: NOTIFY_EMAIL_USERNAME
+  name: MAILGUN_SMTP_PASSWORD
 
 ---
 kind: secret
-name: NOTIFY_EMAIL_PASSWORD
+name: MAILGUN_SMTP_HOST
 get:
   path: secret/drone-ci
-  name: NOTIFY_EMAIL_PASSWORD
+  name: MAILGUN_SMTP_HOST
 
 ---
 kind: secret
-name: NOTIFY_EMAIL_ADDRESS
+name: MAILGUN_SMTP_USERNAME
 get:
   path: secret/drone-ci
-  name: NOTIFY_EMAIL_ADDRESS
+  name: MAILGUN_SMTP_USERNAME
+
+---
+kind: secret
+name: MAILGUN_SMTP_SENDER
+get:
+  path: secret/drone-ci
+  name: MAILGUN_SMTP_SENDER
