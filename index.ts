@@ -1,6 +1,6 @@
-import { Mailgun, messages } from 'mailgun-js';
-
+import FormData from 'form-data';
 import HttpStatus from 'http-status-codes';
+import Mailgun from 'mailgun.js';
 import express from 'express';
 import { getLogger } from '@log4js-node/log4js-api';
 
@@ -53,28 +53,34 @@ export function translateServiceErrors(
 }
 
 export function sendNotifications(
-  mailgun: Mailgun,
-  sendFrom: string,
-  sendTo: string,
   serviceName: string,
+  mailgunUserName: string,
+  mailgunApiKey: string,
+  mailgunDomain: string,
+  mailgunSender: string,
+  mailgunRecipient: string,
   sendByCode = (httpStatusCode: number) => httpStatusCode >= 500 && httpStatusCode < 600
 ) {
-  return (err: ServiceError, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  //@ts-ignore
+  const mailgun = new Mailgun(FormData);
+  const client = mailgun.client({ username: mailgunUserName, key: mailgunApiKey });
+  return (err: ServiceError, _req: express.Request, _res: express.Response, next: express.NextFunction) => {
     if (!sendByCode(err.status)) {
       return;
     }
     const { stackTrace, trimmedError } = (({ stackTrace, ...err }) => ({ stackTrace, trimmedError: err }))(err);
-    const emailData: messages.SendData = {
-      to: sendTo,
-      from: sendFrom,
-      subject: `[${serviceName}] - ${err.error}`,
-      html: `<header>Error:</header>
+    client.messages
+      .create(mailgunDomain, {
+        from: mailgunSender,
+        to: [mailgunRecipient],
+        subject: `[${serviceName}] - ${err.error}`,
+        html: `<header>Error:</header>
       <pre>${JSON.stringify(trimmedError)}</pre>
       <header>Stack Trace:</header>
       <pre>${stackTrace}</pre>
       `,
-    };
-    mailgun.messages().send(emailData, (err) => !!err && getLogger().error(err));
+      })
+      .catch((e) => !!e && getLogger().error(e));
     next(err);
   };
 }
