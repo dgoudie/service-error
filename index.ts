@@ -1,7 +1,8 @@
-import { getLogger } from '@log4js-node/log4js-api';
-import express from 'express';
-import HttpStatus from 'http-status-codes';
 import { Mailgun, messages } from 'mailgun-js';
+
+import HttpStatus from 'http-status-codes';
+import express from 'express';
+import { getLogger } from '@log4js-node/log4js-api';
 
 export class ServiceError {
   public timestamp: string;
@@ -53,6 +54,7 @@ export function translateServiceErrors(
 
 export function sendNotifications(
   mailgun: Mailgun,
+  sendFrom: string,
   sendTo: string,
   serviceName: string,
   sendByCode = (httpStatusCode: number) => httpStatusCode >= 500 && httpStatusCode < 600
@@ -64,7 +66,7 @@ export function sendNotifications(
     const { stackTrace, trimmedError } = (({ stackTrace, ...err }) => ({ stackTrace, trimmedError: err }))(err);
     const emailData: messages.SendData = {
       to: sendTo,
-      from: `do-not-reply@${mailgun['domain']}`,
+      from: sendFrom,
       subject: `[${serviceName}] - ${err.error}`,
       html: `<header>Error:</header>
       <pre>${JSON.stringify(trimmedError)}</pre>

@@ -5,29 +5,20 @@ steps:
   - name: install
     image: node:latest
     commands:
-      - npm set registry https://$${NEXUS_NPM_REPO}/
-      - npm set //$${NEXUS_NPM_REPO}/:_authToken=$${NPM_TOKEN}
       - npm ci
-    environment:
-      NEXUS_NPM_REPO:
-        from_secret: NEXUS_NPM_REPO
-      NPM_TOKEN:
-        from_secret: NPM_TOKEN
   - name: build
     image: node:latest
     commands:
       - npm run tsc
   - name: publish
-    image: node:latest
-    commands:
-      - npm set registry https://$${NEXUS_NPM_REPO}/
-      - npm set //$${NEXUS_NPM_REPO}/:_authToken=$${NPM_TOKEN}
-      - npm publish
-    environment:
-      NEXUS_NPM_REPO:
-        from_secret: NEXUS_NPM_REPO
-      NPM_TOKEN:
-        from_secret: NPM_TOKEN
+    image: plugins/npm
+    settings:
+      username:
+        from_secret: PUBLIC_NPM_USERNAME
+      password:
+        from_secret: PUBLIC_NPM_USERNAME
+      email:
+        from_secret: EMAIL
     when:
       event:
         - tag
@@ -46,7 +37,7 @@ steps:
         from_secret: MAILGUN_SMTP_PASSWORD
       PLUGIN_RECIPIENTS_ONLY: true
     when:
-      status: [changed, failure]
+      status: [failure]
 
 ---
 kind: secret
@@ -57,17 +48,17 @@ get:
 
 ---
 kind: secret
-name: NEXUS_NPM_REPO
+name: PUBLIC_NPM_USERNAME
 get:
   path: secret/drone-ci
-  name: NEXUS_NPM_REPO
+  name: PUBLIC_NPM_USERNAME
 
 ---
 kind: secret
-name: NPM_TOKEN
+name: PUBLIC_NPM_PASSWORD
 get:
   path: secret/drone-ci
-  name: NPM_TOKEN
+  name: PUBLIC_NPM_PASSWORD
 
 ---
 kind: secret
