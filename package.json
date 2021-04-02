@@ -1,7 +1,7 @@
 {
   "name": "@stan/service-error",
   "version": "1.1.3",
-  "description": "stan.systems standard error interface",
+  "description": "goudie.dev standard error interface",
   "main": "dist/index.js",
   "files": [
     "dist"
@@ -10,9 +10,13 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc",
-    "release": "release-it --ci --patch",
-    "release-minor": "release-it --ci --minor",
-    "release-major": "release-it --ci --major"
+    "release:patch": "release-it patch --ci",
+    "release:minor": "release-it minor --ci",
+    "release:major": "release-it major --ci",
+    "release:prerelease": "release-it --ci --preRelease=beta",
+    "release:patch:prerelease": "release-it patch --ci --preRelease=beta",
+    "release:minor:prerelease": "release-it minor --ci --preRelease=beta",
+    "release:major:prerelease": "release-it major --ci --preRelease=beta"
   },
   "author": "Daniel Goudie",
   "license": "MIT",
@@ -25,7 +29,7 @@
   "devDependencies": {
     "@types/express": "^4.17.6",
     "@types/node": "^12.12.41",
-    "release-it": "^12.6.3",
+    "release-it": "^14.3.0",
     "typescript": "^3.9.3"
   }
 }

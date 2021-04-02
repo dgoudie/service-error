@@ -35,11 +35,15 @@ export function handleRemainingErrors() {
 }
 
 export function translateServiceErrors(
-  logByCode = (httpStatusCode: number) => httpStatusCode >= 500 && httpStatusCode < 600
+  logWarnByCode = (httpStatusCode: number) => httpStatusCode >= 400 && httpStatusCode < 500,
+  logErrorByCode = (httpStatusCode: number) => httpStatusCode >= 500 && httpStatusCode < 600
 ) {
   return (err: ServiceError, req: express.Request, res: express.Response, next: express.NextFunction) => {
     err.path = req.path;
-    if (logByCode(err.status)) {
+    if (logWarnByCode(err.status)) {
+      getLogger().warn(err.message);
+    }
+    if (logErrorByCode(err.status)) {
       getLogger().error(err.message);
     }
     res.status(err.status).send(err);
@@ -66,9 +70,9 @@ export function sendNotifications(
       <pre>${JSON.stringify(trimmedError)}</pre>
       <header>Stack Trace:</header>
       <pre>${stackTrace}</pre>
-      `
+      `,
     };
-    mailgun.messages().send(emailData, err => !!err && getLogger().error(err));
+    mailgun.messages().send(emailData, (err) => !!err && getLogger().error(err));
     next(err);
   };
 }
