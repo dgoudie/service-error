@@ -1,6 +1,6 @@
 {
   "name": "@dgoudie/service-error",
-  "version": "3.0.0-3",
+  "version": "3.0.0-4",
   "description": "goudie.dev standard error interface",
   "main": "dist/index.js",
   "files": [
