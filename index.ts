@@ -50,7 +50,12 @@ export function translateServiceErrors(
     logErrorByCode = (httpStatusCode: number) =>
         httpStatusCode >= 500 && httpStatusCode < 600
 ) {
-    return (err: ServiceError, req: Request, res: Response) => {
+    return (
+        err: ServiceError,
+        req: Request,
+        res: Response,
+        _next: NextFunction
+    ) => {
         err.path = req.path;
         if (logWarnByCode(err.status)) {
             getLogger().warn(err.message);
