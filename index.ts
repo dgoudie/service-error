@@ -5,20 +5,18 @@ import HttpStatus from 'http-status-codes';
 import Mailgun from 'mailgun.js';
 import { getLogger } from '@log4js-node/log4js-api';
 
-export class ServiceError extends Error {
+export class ServiceError {
     public timestamp: string;
     public error: string;
-    public path: string;
+    public path: string | null = null;
 
     constructor(
         public status: number,
         public message: string,
-        public stack: string = null
+        public stack: string | null = null
     ) {
-        super(message);
         this.error = HttpStatus.getStatusText(status);
         this.timestamp = new Date().toISOString();
-        this.stack = stack;
     }
 }
 
@@ -104,7 +102,7 @@ export function sendNotifications(
       <pre>${stack}</pre>
       `,
             })
-            .catch((e) => !!e && getLogger().error(e));
+            .catch((e: any) => !!e && getLogger().error(e));
         next(err);
     };
 }

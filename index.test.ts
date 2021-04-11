@@ -113,6 +113,7 @@ describe('translateServiceErrors', () => {
         //@ts-ignore
         status: jest.fn(() => ({ send })),
     };
+    let next = jest.fn();
 
     beforeEach(() => {
         jest.resetModules();
@@ -123,6 +124,7 @@ describe('translateServiceErrors', () => {
             //@ts-ignore
             status: jest.fn(() => ({ send })),
         };
+        next = jest.fn();
     });
 
     it('should add path, log warn, and send response', () => {
@@ -135,7 +137,8 @@ describe('translateServiceErrors', () => {
         translateServiceErrors()(
             error,
             mockRequest as Request,
-            mockResponse as Response
+            mockResponse as Response,
+            next
         );
 
         expect(mockResponse.status).toBeCalledWith(code);
@@ -152,7 +155,8 @@ describe('translateServiceErrors', () => {
         translateServiceErrors()(
             error,
             mockRequest as Request,
-            mockResponse as Response
+            mockResponse as Response,
+            next
         );
 
         expect(log4js.getLogger().error).toBeCalledWith(message, stack);
