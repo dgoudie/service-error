@@ -12,13 +12,13 @@ export class ServiceError extends Error {
 
     constructor(
         public status: number,
-        message: string,
-        stackTrace: string = null
+        public message: string,
+        public stack: string = null
     ) {
         super(message);
         this.error = HttpStatus.getStatusText(status);
         this.timestamp = new Date().toISOString();
-        this.stack = stackTrace;
+        this.stack = stack;
     }
 }
 
